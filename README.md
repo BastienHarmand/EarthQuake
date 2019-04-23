@@ -10,7 +10,7 @@
 ## Description
 
  Etude d'un dataset portant sur les seismes, explosions nucleaires, explosions et eclatements de rocher de 1965 a 2016.
- L'etude correspond pas precisement en 3 graphiques : Background map + bubble, density, scatterplot
+ L'etude correspond plus precisement en 3 graphiques : Background map + bubble, density, scatterplot
 
 ## Librairies utilisees
 
