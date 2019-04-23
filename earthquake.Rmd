@@ -1,0 +1,52 @@
+---
+title: "Earthquakes"
+author: "Bastien Harmand"
+date: "12 avril 2019"
+output: 
+  html_document: 
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+
+```
+
+## Le Dataset
+
+This dataset includes a record of the date, time, location, depth, magnitude, and source of every earthquake with a reported magnitude 5.5 or higher since 1965. 
+
+<https://www.kaggle.com/usgs/earthquake-database/version/1>
+
+
+```{r dataset, echo = FALSE}
+earthquakes <- read.csv(file="database.csv", header=TRUE, sep=",")
+summary(earthquakes[,c('Type','Depth','Magnitude','Date')])
+```
+
+
+
+## Carte Interactive 2015
+
+```{r map, echo=FALSE, warning=FALSE, warn.conflicts = FALSE , fig.width=10}
+library(plotly,warn.conflicts = FALSE)
+library(ggmap,warn.conflicts = FALSE)
+
+earthquakes <- filter(earthquakes,as.numeric(format(as.Date(Date, format="%m/%d/%Y"),'%Y'))==2015)
+
+# Get the world map
+wolrdMap <- map_data("world")
+
+# plot the map
+map_plot <- ggplot(wolrdMap,aes(x=long, y = lat)) +
+  geom_polygon(fill = 'white', aes(group = group)) +
+  geom_jitter(data=earthquakes,aes(size = earthquakes$Magnitude,x=earthquakes$Longitude,y=earthquakes$Latitude), color="gold") +
+  theme(panel.background = element_rect(fill = 'lightblue'))
+
+ggplotly(map_plot)
+#ggplotly(ggplot() + , ,fill='white')
+#        + geom_jitter(data=earthquakes,aes(fill = Magnitude,x=Longitude,y=Latitude)))
+
+
+```
+
+
