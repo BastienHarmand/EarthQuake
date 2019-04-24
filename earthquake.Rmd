@@ -1,13 +1,19 @@
 ---
 title: "Earthquakes"
-author: "Bastien Harmand"
+author: "Valentin PENAUD--POLGE & Bastien Harmand"
 date: "12 avril 2019"
 output: 
   html_document: 
-    theme: spacelab
+    theme: lumen
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, message=FALSE, echo=FALSE}
+
+library(tidyverse)
+library(plotly)
+library(ggmap)
+library(ggplot2)
+library(dplyr)
 
 ```
 
@@ -20,33 +26,80 @@ This dataset includes a record of the date, time, location, depth, magnitude, an
 
 ```{r dataset, echo = FALSE}
 earthquakes <- read.csv(file="database.csv", header=TRUE, sep=",")
-summary(earthquakes[,c('Type','Depth','Magnitude','Date')])
+earthquakes$Date <- as.Date(earthquakes$Date, format="%m/%d/%Y")
+earthquakes$Year <- as.numeric(format(earthquakes$Date,"%Y"))
+summary(earthquakes[,c('Type','Depth','Magnitude','Date','Year')])
 ```
 
+## Carte Interactive Séismes
 
+Sur cette carte figure les séismes dont la magnitude est supérieure ou égale à 7.5. En couleur figure l'année, et la taille est proportionelle à la magnitude.
 
-## Carte Interactive 2015
+```{r map, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE, warn.conflicts=FALSE}
 
-```{r map, echo=FALSE, warning=FALSE, warn.conflicts = FALSE , fig.width=10}
-library(plotly,warn.conflicts = FALSE)
-library(ggmap,warn.conflicts = FALSE)
-
-earthquakes <- filter(earthquakes,as.numeric(format(as.Date(Date, format="%m/%d/%Y"),'%Y'))==2015)
+earthquakes7 <- filter(earthquakes,Magnitude>=7.5)
 
 # Get the world map
 wolrdMap <- map_data("world")
 
 # plot the map
 map_plot <- ggplot(wolrdMap,aes(x=long, y = lat)) +
-  geom_polygon(fill = 'white', aes(group = group)) +
-  geom_jitter(data=earthquakes,aes(size = earthquakes$Magnitude,x=earthquakes$Longitude,y=earthquakes$Latitude), color="gold") +
-  theme(panel.background = element_rect(fill = 'lightblue'))
+  geom_polygon(fill = 'white', aes(group = group)) + # Affichage de la carte 
+  geom_point(data=earthquakes7,aes(size = Magnitude,x=Longitude,y=Latitude,color=Date)) + # Affichage des points
+  theme(panel.background = element_rect(fill = 'lightblue')) + # Couleur de fond
+  scale_x_continuous(name="Longitude", seq(-180, 180,20)) +  # Axe Y
+  scale_y_continuous(name="Latitude", seq(-90, 90,20)) +  # Axe X
+  coord_cartesian(xlim=c(-100,180),ylim=c(-40,80)) +
+  ggtitle("Carte des plus grands séismes")
 
-ggplotly(map_plot)
-#ggplotly(ggplot() + , ,fill='white')
-#        + geom_jitter(data=earthquakes,aes(fill = Magnitude,x=Longitude,y=Latitude)))
-
+ggp <- ggplotly(map_plot)
+ggp %>% layout(dragmode = "pan") %>% config(displayModeBar = "static", collaborate = F, displaylogo = FALSE, modeBarButtonsToRemove = list("sendDataToCloud", "toImage", "autoScale2d", "resetScale2d", "hoverClosestCartesian", "hoverCompareCartesian", "select2d", "lasso2d", "toggleSpikelines")
+)
 
 ```
 
+## Distributions des magnitudes
+
+Nous voulons observer les distributions des magnitudes.
+Le dataset ne présente pas de valeurs de magnitude en dessous de 5,5.
+
+```{r density, echo=FALSE}
+density_plot <- earthquakes %>%
+  filter(Type != "Rock Burst") %>% # Nous enlevons "Rock Burst" et "Explosion" car nous n'avons pas assez d’occurrences
+  filter(Type != "Explosion") %>%
+  ggplot(aes(Magnitude)) +
+  geom_density(bw = 0.1) +
+  ggtitle("Density of Magnitude") + # titre
+  facet_wrap(~Type, scale="free_y") # séparation des distributions
+
+ggplotly(density_plot)
+```
+
+
+Les magnitudes des séismes semblent suivre une loi normale (phénomène naturel) mais ce n'est pas le cas des explosions nucléaires (non naturelles).
+
+De plus le nombre d'occurrence de type "séisme" est bien plus important que le nombre d'occurrence de type "explosion nucléaire" -> Le théorème central limite doit également jouer son rôle dans les distributions observées.
+
+
+## Distribution temporelle des plus "gros" séismes
+
+
+```{r temps, echo=FALSE}
+
+# On prend les maximums dd chaque anneés
+maximum <- earthquakes7 %>%
+  group_by(Year) %>%
+  summarize(maxi = max(Magnitude, na.rm = TRUE))
+
+temps_plot <- ggplot() +
+  geom_bar(data = maximum,aes(x=Year, y = maxi),stat="identity",fill = 'darkgrey') +
+  geom_jitter(data = earthquakes7,aes(x=Year, y = Magnitude), color = 'darkred', size = 1) +
+  scale_y_continuous(name="Magnitude", seq(5.5,10,0.5)) +  # Axe X
+  coord_cartesian(xlim = c(1965, 2015), ylim = c(7.5, 10)) +
+  ggtitle("Chronologie des plus grands séismes")
+
+
+ggplotly(temps_plot)
+
+```
 
