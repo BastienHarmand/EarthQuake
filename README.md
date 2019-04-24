@@ -14,20 +14,20 @@
  
 ### Graphique 1 : Carte interactive
 
-On presente la Magnitude (var. continue) par la taille des bulles, puis on les places en fonction de leur latitude et de leur longitude. La date est indiquée par la couleur du point.
-**4 variable continues**
+On presente la Magnitude (var. continue) par la taille des bulles, puis on les places en fonction de leur latitude et de leur longitude. La date est indiquée par la couleur du point. 
+**(4 variable continues)**
 
 ### Graphique 2 : Densité
 
-Les densité des magnitudes (var. continue) sont présentées pour deux types.
-**Une variable continue**
+Les densité des magnitudes (var. continue) sont présentées pour deux types. 
+**(Une variable continue)**
 
 ### Graphique 3 :
 
 Nous avons ici représenté l'historique des séismes de magnitude supérieure à 7.5.
-Les points sont les séismes, et les barres représentent la maximum sur chaque années.
-**Deux variables continues pour les points**
-**une variable continue et une discrète pour les barres**
+Les points sont les séismes, et les barres représentent la maximum sur chaque années. 
+**(Deux variables continues pour les points)**  
+**(une variable continue et une discrète pour les barres)**
 
 ## Librairies utilisees
 
