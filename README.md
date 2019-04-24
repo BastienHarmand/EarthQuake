@@ -22,7 +22,7 @@ On presente la Magnitude (var. continue) par la taille des bulles, puis on les p
 Les densité des magnitudes (var. continue) sont présentées pour deux types. 
 **(Une variable continue)**
 
-### Graphique 3 :
+### Graphique 3 : Historique
 
 Nous avons ici représenté l'historique des séismes de magnitude supérieure à 7.5.
 Les points sont les séismes, et les barres représentent la maximum sur chaque années. 
